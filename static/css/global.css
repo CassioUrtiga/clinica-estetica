@@ -1,0 +1,86 @@
+/* ==========================================================================
+   VARIÁVEIS DE DESIGN
+   ========================================================================== */
+:root {
+    --bg-primary: #FAF8F5;
+    --bg-surface: #FFFFFF;
+    --text-main: #1C1917;
+    --text-muted: #78716C;
+    --accent-gold: #8C6D46;
+    --accent-gold-light: #B89B72;
+    --border-color: #E7E5E4;
+    --border-hover: #1C1917;
+    --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.05);
+    --shadow-elevated: 0 20px 40px rgba(0, 0, 0, 0.08);
+    --radius-sm: 8px;
+    --radius-md: 16px;
+    --radius-full: 9999px;
+    --font-serif: 'Cormorant Garamond', Georgia, serif;
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Base & Resets */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-main);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+.container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+/* Tipografia */
+h1, h2, h3, h4 {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+.section-tag {
+    display: inline-block;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent-gold-light);
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    color: var(--text-main);
+}
+
+.text-center {
+    text-align: center;
+}
+
+.max-w-md {
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+/* RESPONSIVIDADE */
+@media (max-width: 768px) {
+    .section-title {
+        font-size: 2rem;
+    }
+}

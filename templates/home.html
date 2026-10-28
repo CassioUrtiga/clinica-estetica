@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Aura Estética{% endblock title %}
+
+{% block css %}
+
+<link rel="stylesheet" href="{% static 'css/header.css' %}">
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+<link rel="stylesheet" href="{% static 'css/rodape.css' %}">
+
+{% endblock css %}
+
+{% block header %}
+
+{% include "components/header.html" %}
+
+{% endblock header %}
+
+{% block content %}
+<!-- HERO SECTION -->
+<section class="hero-section">
+    <div class="container hero-container">
+        <div class="hero-content">
+            <span class="section-tag">Estética de Alta Performance</span>
+            <h1 class="hero-title">Realce sua beleza natural com sofisticação</h1>
+            <p class="hero-subtitle">Tratamentos personalizados com tecnologia de ponta e protocolo exclusivo em um ambiente acolhedor e luxuoso.</p>
+            <div class="hero-actions">
+                <button class="btn btn-primary" id="open-modal-hero">Agendar Avaliação</button>
+                <a href="#tratamentos" class="btn btn-outline">Ver Procedimentos</a>
+            </div>
+            <div class="hero-metrics">
+                <div class="metric-item">
+                    <span class="metric-number">+5k</span>
+                    <span class="metric-label">Atendimentos</span>
+                </div>
+                <div class="metric-divider"></div>
+                <div class="metric-item">
+                    <span class="metric-number">98%</span>
+                    <span class="metric-label">Satisfação</span>
+                </div>
+                <div class="metric-divider"></div>
+                <div class="metric-item">
+                    <span class="metric-number">10+</span>
+                    <span class="metric-label">Anos de Experiência</span>
+                </div>
+            </div>
+        </div>
+        <div class="hero-image-wrapper">
+            <img src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&q=80" alt="Atendimento na Clínica Aura" class="hero-img">
+            <div class="hero-badge">
+                <i data-lucide="sparkles"></i>
+                <span>Atendimento Exclusivo</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- COMPARADOR ANTES & DEPOIS -->
+<section id="resultados" class="section-results">
+    <div class="container">
+        <div class="text-center max-w-md">
+            <span class="section-tag">Resultados Reais</span>
+            <h2 class="section-title">Transformação Natural</h2>
+        </div>
+
+        <div class="before-after-wrapper">
+            <div class="comparison-slider" id="comparison-slider">
+                <!-- Imagem do Depois (Fundo) -->
+                <img src="https://images.unsplash.com/photo-1512290900673-7002004117b8?auto=format&fit=crop&q=80" alt="Depois" class="img-after">
+                <!-- Imagem do Antes (Sobreposta/Cortada) -->
+                <div class="img-before-wrapper" id="before-wrapper">
+                    <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80" alt="Antes" class="img-before">
+                </div>
+                <!-- Barra Divisora -->
+                <div class="slider-handle" id="slider-handle">
+                    <div class="handle-line"></div>
+                    <div class="handle-circle">
+                        <i data-lucide="chevrons-left-right"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="comparison-labels">
+                <span class="label-badge">Antes</span>
+                <span class="label-badge">Depois (Protocolo Aura)</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CALCULADORA DE PROCEDIMENTOS -->
+<section class="section-calculator">
+    <div class="container">
+        <div class="calculator-card">
+            <div class="calculator-header">
+                <span class="section-tag">Simulador Rápido</span>
+                <h2 class="section-title">Monte seu Combo de Tratamentos</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 8px;">
+                    Selecione 2 ou mais procedimentos e ganhe <strong>10% de desconto</strong> automático.
+                </p>
+            </div>
+
+            <div class="calculator-body">
+                <div class="calc-options">
+                    <label class="calc-item">
+                        <input type="checkbox" class="calc-checkbox" data-price="250" value="Limpeza de Pele">
+                        <div class="calc-info">
+                            <span class="calc-name">Limpeza de Pele Profunda</span>
+                            <span class="calc-price">R$ 250,00</span>
+                        </div>
+                    </label>
+
+                    <label class="calc-item">
+                        <input type="checkbox" class="calc-checkbox" data-price="1200" value="Preenchimento Labial">
+                        <div class="calc-info">
+                            <span class="calc-name">Preenchimento Labial</span>
+                            <span class="calc-price">R$ 1.200,00</span>
+                        </div>
+                    </label>
+
+                    <label class="calc-item">
+                        <input type="checkbox" class="calc-checkbox" data-price="180" value="Drenagem Linfática">
+                        <div class="calc-info">
+                            <span class="calc-name">Drenagem Linfática</span>
+                            <span class="calc-price">R$ 180,00</span>
+                        </div>
+                    </label>
+
+                    <label class="calc-item">
+                        <input type="checkbox" class="calc-checkbox" data-price="350" value="Peeling Químico">
+                        <div class="calc-info">
+                            <span class="calc-name">Peeling Químico</span>
+                            <span class="calc-price">R$ 350,00</span>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="calc-summary">
+                    <h3>Resumo da Simulação</h3>
+                    <div class="summary-line">
+                        <span>Subtotal:</span>
+                        <span id="calc-subtotal">R$ 0,00</span>
+                    </div>
+                    <div class="summary-line discount-line">
+                        <span>Desconto Combo (10%):</span>
+                        <span id="calc-discount">- R$ 0,00</span>
+                    </div>
+                    <div class="summary-divider"></div>
+                    <div class="summary-line total-line">
+                        <span>Estimativa Total:</span>
+                        <span id="calc-total">R$ 0,00</span>
+                    </div>
+                    <button class="btn btn-primary" id="open-modal-calc" style="width: 100%; margin-top: 20px;">
+                        Agendar este Combo
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="tratamentos" class="section-treatments">
+    <div class="container">
+        
+        <div class="text-center max-w-md">
+            <span class="section-tag">Nossos Serviços</span>
+            <h2 class="section-title">Tratamentos Exclusivos</h2>
+        </div>
+
+        <!-- Filtros Dinâmicos por Categoria -->
+        <div class="filters-container">
+            {% for categoria in categorias %}
+                {% if categoria.tratamentos.exists %}
+                    {% if forloop.first %}
+                        <button class="filter-btn active" data-filter="all">Todos</button>
+                    {% endif %}
+
+                    <button class="filter-btn" data-filter="{{ categoria.slug }}">{{ categoria.nome }}</button>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- Grid de Cards -->
+        <div class="treatments-grid">
+            {% for t in tratamentos %}
+                <div class="treatment-card" data-category="{{ t.categoria.slug }}">
+                    <div class="card-image-wrapper">
+                        {% if t.imagem %}
+                            <img src="{{ t.imagem.url }}" alt="{{ t.titulo }}" class="card-image">
+                        {% else %}
+                            <img src="https://placehold.co/600x400" alt="{{ t.titulo }}" class="card-image">
+                        {% endif %}
+                        <span class="card-category-badge">{{ t.categoria.nome }}</span>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="card-title">{{ t.titulo }}</h3>
+                        <p class="card-description">{{ t.descricao }}</p>
+                        <div class="card-footer">
+                            <span class="card-duration">Duração: {{ t.duracao }}</span>
+                            <span class="card-price">R$ {{ t.preco }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                    <p class="text-center" style="grid-column: 1 / -1; color: var(--text-muted);">
+                        Nenhum tratamento cadastrado no momento.
+                    </p>
+            {% endfor %}
+        </div>
+
+    </div>
+</section>
+
+{% include "components/rodape.html" %}
+
+{% endblock content %}
+
+{% block script %}
+
+<script src="{% static 'js/header.js' %}"></script>
+<script src="{% static 'js/home.js' %}"></script>
+
+{% endblock script %}

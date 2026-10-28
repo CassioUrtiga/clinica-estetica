@@ -1,0 +1,164 @@
+<header class="header">
+    <div class="container nav-container">
+        <a href="{% url 'home' %}" class="logo">AURA</a>
+        <nav>
+            <ul class="nav-menu">
+                <li><a href="#tratamentos" class="nav-link">Tratamentos</a></li>
+                <li><a href="#sobre" class="nav-link">A Clínica</a></li>
+                <li><a href="#contato" class="nav-link">Contato</a></li>
+            </ul>
+        </nav>
+        <div style="display: flex; gap: 12px; align-items: center;">
+            <button class="btn btn-primary" id="open-modal-btn">Agendar Consultoria</button>
+            <button class="btn btn-outline" id="open-drawer-btn">Meus Tratamentos</button>
+        </div>
+    </div>
+</header>
+
+<!-- BARRA LATERAL - CONTA -->
+<div id="treatments-drawer-overlay" class="drawer-overlay">
+    <div class="drawer-content">
+        
+        <!-- CABEÇALHO -->
+        <div class="drawer-header">
+            <h3 id="drawer-title">Minha Conta</h3>
+            <button id="close-drawer-btn" class="drawer-close-btn">&times;</button>
+        </div>
+
+        <!-- CORPO DO DRAWER -->
+        <div class="drawer-body">
+
+            <!-- ETAPA 1: LOGIN (EMAIL + CÓDIGO 5 DÍGITOS) -->
+            <div id="auth-section" class="auth-box">
+                <div class="auth-info-header">
+                    <span class="section-tag">Acesso Rápido</span>
+                    <h4>Identifique-se para ver seus agendamentos</h4>
+                    <p class="auth-desc">Digite seu e-mail para receber um código de acesso instantâneo.</p>
+                </div>
+
+                <!-- Passo A: Form de E-mail -->
+                <form id="form-step-email" class="auth-form">
+                    <div class="form-group">
+                        <label class="form-label">E-mail Cadastrado</label>
+                        <input type="email" id="user-email-input" class="form-input" placeholder="seu@email.com" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        Receber Código de Acesso
+                    </button>
+                </form>
+
+                <!-- Passo B: Form de Código de 5 dígitos (Inicialmente Oculto) -->
+                <form id="form-step-code" class="auth-form hidden">
+                    <p class="code-sent-text">Código enviado para <strong id="sent-email-label"></strong></p>
+
+                    <div class="form-group">
+                        <label class="form-label">Código de 5 dígitos</label>
+                        <div class="code-input-container">
+                            <input type="text" maxlength="1" class="code-digit" pattern="[0-9]" inputmode="numeric" required>
+                            <input type="text" maxlength="1" class="code-digit" pattern="[0-9]" inputmode="numeric" required>
+                            <input type="text" maxlength="1" class="code-digit" pattern="[0-9]" inputmode="numeric" required>
+                            <input type="text" maxlength="1" class="code-digit" pattern="[0-9]" inputmode="numeric" required>
+                            <input type="text" maxlength="1" class="code-digit" pattern="[0-9]" inputmode="numeric" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        Validar e Entrar
+                    </button>
+                    <button type="button" id="back-to-email-btn" class="btn-link">
+                        Trocar e-mail
+                    </button>
+                </form>
+            </div>
+
+            <!-- ETAPA 2: LISTA DE TRATAMENTOS DO USUÁRIO (Oculto até logar) -->
+            <div id="treatments-section" class="user-treatments-box hidden">
+                <div class="drawer-card">
+                    <div class="drawer-card-info">
+                        <span class="drawer-card-tag">Agendado</span>
+                        <h4>Limpeza de Pele Profunda</h4>
+                        <p>
+                            <i data-lucide="calendar"></i> 15 de Outubro às 14:00
+                        </p>
+                        <p class="drawer-card-notes">
+                            <i data-lucide="file-text"></i>
+                            <span>Pele sensível, preferência por produtos sem fragrância.</span>
+                        </p>
+                    </div>
+                    <span class="drawer-card-price">R$ 250,00</span>
+                </div>
+
+                <div class="drawer-card">
+                    <div class="drawer-card-info">
+                        <span class="drawer-card-tag completed">Concluído</span>
+                        <h4>Preenchimento Labial</h4>
+                        <p>
+                            <i data-lucide="calendar"></i> 20 de Setembro às 10:00
+                        </p>
+                        <p class="drawer-card-notes">
+                            <i data-lucide="file-text"></i>
+                            <span>Pele sensível, preferência por produtos sem fragrância.</span>
+                        </p>
+                    </div>
+                    <span class="drawer-card-price">R$ 1.200,00</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RODAPÉ DO DRAWER -->
+        <div class="drawer-footer">
+            <button class="btn btn-primary" style="width: 100%;" id="open-modal-from-drawer">
+                + Novo Agendamento
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<!-- MODAL DE AGENDAMENTOS -->
+<div id="booking-modal" class="modal-overlay">
+    <div class="modal-container">
+        <button id="close-modal-btn" class="modal-close">&times;</button>
+        <h3 style="font-size: 1.75rem; margin-bottom: 8px;">Agendar Consulta</h3>
+        <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 24px;">Preencha os dados abaixo para solicitar seu atendimento.</p>
+
+        <form method="POST" action="{% url 'home' %}">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label class="form-label">Nome Completo</label>
+                {{ form.nome }}
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">E-mail</label>
+                    {{ form.email }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Telefone</label>
+                    {{ form.telefone }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Tratamento Desejado</label>
+                {{ form.tratamento }}
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Data Preferencial</label>
+                    {{ form.data }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Horário</label>
+                    {{ form.horario }}
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 12px;">Confirmar Agendamento</button>
+        </form>
+    </div>
+</div>
