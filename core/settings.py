@@ -3,24 +3,29 @@ from decouple import config
 import os
 import dj_database_url
 
-# CASO AMBIENTE DE PRODUÇÃO ADICIONAR: ENV (ORIGIN, DATABASE_URL)
+# AMBIENTE DE PRODUÇÃO ADICIONAR NO ENV (HOSTS, ORIGIN, DATABASE_URL, EMAIL)
 
-# Tipo de ambiente de desenvolvimento (local, production, workflow)
-development = config('DEVELOPMENT')
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY')
-
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', cast=bool)
 
-if development == 'production':
-    ALLOWED_HOSTS = config('HOSTS', cast=lambda v: v.split(','))
+# EMAIL
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+    DEFAULT_FROM_EMAIL = 'Clinica email@clinica.com'
 else:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = config('EMAIL_HOST')
+    EMAIL_PORT = config('EMAIL_PORT', cast=int)
+    EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
+    EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+    EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+
+# HOSTS
+if DEBUG:
     ALLOWED_HOSTS = ['*']
+else:
+    ALLOWED_HOSTS = config('HOSTS', cast=lambda v: v.split(','))
 
 # Application definition
 INSTALLED_APPS = [
@@ -47,7 +52,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'core.urls'
 
-if development == 'production':
+if not DEBUG:
     CSRF_TRUSTED_ORIGINS = [config('ORIGIN')]
 
 TEMPLATES = [
@@ -71,7 +76,7 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-if development == 'local':
+if DEBUG:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -82,24 +87,10 @@ if development == 'local':
             'PORT': config('PORT'),
         }
     }
-
-if development == 'production':
+else:
     DATABASES = {
         'default': dj_database_url.parse(config('DATABASE_URL'), conn_max_age=600),
     }
-
-if development == 'workflow':
-    DATABASES = {
-        'default': {
-           'ENGINE': 'django.db.backends.postgresql',
-           'NAME': 'github_actions',
-           'USER': 'postgres',
-           'PASSWORD': 'postgres',
-           'HOST': '127.0.0.1',
-           'PORT': '5432',
-        }
-    }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators

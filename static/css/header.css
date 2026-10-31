@@ -72,6 +72,7 @@
     border-color: var(--border-color);
     background-color: transparent;
     color: var(--text-main);
+    border-width: 2.5px;
 }
 
 .btn-outline:hover {
@@ -191,7 +192,7 @@
     inset: 0;
     background-color: rgba(28, 25, 23, 0.5);
     backdrop-filter: blur(4px);
-    z-index: 1000;
+    z-index: 9999;
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease-in-out;
@@ -375,6 +376,43 @@
 
 .btn-link:hover {
     color: var(--text-main);
+}
+
+/* Estilo base para a tag de status */
+.drawer-card-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 12px;
+    margin-bottom: 6px;
+    text-transform: capitalize;
+}
+
+/* Status: Pendente (Amarelo / Laranja) */
+.drawer-card-tag.pending {
+    background-color: #fef3c7;
+    color: #d97706;
+}
+
+/* Status: Confirmado (Verde) */
+.drawer-card-tag.confirmed {
+    background-color: #dcfce7;
+    color: #15803d;
+}
+
+/* Status: Cancelado (Vermelho) */
+.drawer-card-tag.cancelled {
+    background-color: #fee2e2;
+    color: #b91c1c;
+}
+
+.form-error-msg {
+    color: #dc2626;
+    font-size: 0.8rem;
+    margin-top: 6px;
+    display: block;
+    text-align: center;
 }
 
 
