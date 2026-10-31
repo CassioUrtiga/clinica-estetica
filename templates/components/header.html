@@ -10,7 +10,16 @@
         </nav>
         <div style="display: flex; gap: 12px; align-items: center;">
             <button class="btn btn-primary" id="open-modal-btn">Agendar Consultoria</button>
+            <button class="btn btn-primary">Fale Conosco</button>
             <button class="btn btn-outline" id="open-drawer-btn">Meus Tratamentos</button>
+            <a href="{% url 'encerrar_sessao' %}" 
+                class="btn btn-outline {% if not sessao %}hidden{% endif %}" 
+                id="close-session-btn" 
+                style="color: #dc2626; border: 1px solid #dc2626; background-color: transparent; transition: all 0.2s ease-in-out; text-decoration: none;"
+                onmouseover="this.style.backgroundColor='#dc2626'; this.style.color='#ffffff';"
+                onmouseout="this.style.backgroundColor='transparent'; this.style.color='#dc2626';">
+                    Encerrar
+            </a>
         </div>
     </div>
 </header>
@@ -37,18 +46,21 @@
                 </div>
 
                 <!-- Passo A: Form de E-mail -->
-                <form id="form-step-email" class="auth-form">
+                <form action="{% url 'validar_email' %}" method="post" id="form-step-email" class="auth-form">
+                    {% csrf_token %}
                     <div class="form-group">
                         <label class="form-label">E-mail Cadastrado</label>
-                        <input type="email" id="user-email-input" class="form-input" placeholder="seu@email.com" required>
+                        <input type="email" id="user-email-input" name="emailConta" class="form-input" placeholder="seu@email.com" required>
+                        <span id="email-error-msg" class="form-error-msg"></span>
                     </div>
-                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <button type="submit" id="btn-submit-email" class="btn btn-primary" style="width: 100%;">
                         Receber Código de Acesso
                     </button>
                 </form>
 
                 <!-- Passo B: Form de Código de 5 dígitos (Inicialmente Oculto) -->
-                <form id="form-step-code" class="auth-form hidden">
+                <form action="{% url 'validar_codigo_email' %}" id="form-step-code" class="auth-form hidden">
+                    {% csrf_token %}
                     <p class="code-sent-text">Código enviado para <strong id="sent-email-label"></strong></p>
 
                     <div class="form-group">
@@ -60,6 +72,8 @@
                             <input type="text" maxlength="1" class="code-digit" pattern="[0-9]" inputmode="numeric" required>
                             <input type="text" maxlength="1" class="code-digit" pattern="[0-9]" inputmode="numeric" required>
                         </div>
+                        <!-- MENSAGEM DE ERRO DO CÓDIGO -->
+                        <span id="code-error-msg" class="form-error-msg"></span>
                     </div>
 
                     <button type="submit" class="btn btn-primary" style="width: 100%;">
@@ -71,48 +85,18 @@
                 </form>
             </div>
 
-            <!-- ETAPA 2: LISTA DE TRATAMENTOS DO USUÁRIO (Oculto até logar) -->
+            <!-- ETAPA 2: LISTA DE TRATAMENTOS DO USUÁRIO -->
             <div id="treatments-section" class="user-treatments-box hidden">
-                <div class="drawer-card">
-                    <div class="drawer-card-info">
-                        <span class="drawer-card-tag">Agendado</span>
-                        <h4>Limpeza de Pele Profunda</h4>
-                        <p>
-                            <i data-lucide="calendar"></i> 15 de Outubro às 14:00
-                        </p>
-                        <p class="drawer-card-notes">
-                            <i data-lucide="file-text"></i>
-                            <span>Pele sensível, preferência por produtos sem fragrância.</span>
-                        </p>
-                    </div>
-                    <span class="drawer-card-price">R$ 250,00</span>
-                </div>
-
-                <div class="drawer-card">
-                    <div class="drawer-card-info">
-                        <span class="drawer-card-tag completed">Concluído</span>
-                        <h4>Preenchimento Labial</h4>
-                        <p>
-                            <i data-lucide="calendar"></i> 20 de Setembro às 10:00
-                        </p>
-                        <p class="drawer-card-notes">
-                            <i data-lucide="file-text"></i>
-                            <span>Pele sensível, preferência por produtos sem fragrância.</span>
-                        </p>
-                    </div>
-                    <span class="drawer-card-price">R$ 1.200,00</span>
-                </div>
+                <!-- Os cards serão injetados dinamicamente via JS aqui -->
             </div>
-
         </div>
 
-        <!-- RODAPÉ DO DRAWER -->
         <div class="drawer-footer">
-            <button class="btn btn-primary" style="width: 100%;" id="open-modal-from-drawer">
-                + Novo Agendamento
+            <button class="btn btn-primary" id="open-modal-from-drawer" style="display: flex; align-items: center; gap: 8px; width: 100%">
+                <i data-lucide="plus"></i>
+                <span>Novo Agendamento</span>
             </button>
         </div>
-
     </div>
 </div>
 

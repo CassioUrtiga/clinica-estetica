@@ -1,0 +1,33 @@
+{% if messages %}
+<div class="toast-container">
+    {% for message in messages %}
+        <div class="toast toast-{{ message.tags|default:'info' }}">
+            <div class="toast-icon">
+                {% if message.tags == 'error' %}
+                    <i data-lucide="alert-circle"></i>
+                {% elif message.tags == 'success' %}
+                    <i data-lucide="check-circle-2"></i>
+                {% elif message.tags == 'warning' %}
+                    <i data-lucide="alert-triangle"></i>
+                {% else %}
+                    <i data-lucide="info"></i>
+                {% endif %}
+            </div>
+            
+            <div class="toast-content">
+                <span class="toast-title">
+                    {% if message.tags == 'error' %}Erro
+                    {% elif message.tags == 'success' %}Sucesso
+                    {% elif message.tags == 'warning' %}Atenção
+                    {% else %}Informação{% endif %}
+                </span>
+                <p class="toast-message">{{ message }}</p>
+            </div>
+
+            <button type="button" class="toast-close" onclick="this.parentElement.remove()">
+                <i data-lucide="x"></i>
+            </button>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
