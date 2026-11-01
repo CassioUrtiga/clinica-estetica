@@ -34,23 +34,25 @@
             </div>
             <div class="hero-metrics">
                 <div class="metric-item">
-                    <span class="metric-number">+5k</span>
+                    <span class="metric-number">
+                        {% if not metrica_atendimentos == "0" %}+{% endif %}{{ metrica_atendimentos }}
+                    </span>
                     <span class="metric-label">Atendimentos</span>
                 </div>
                 <div class="metric-divider"></div>
                 <div class="metric-item">
-                    <span class="metric-number">98%</span>
+                    <span class="metric-number">{{ metrica_satisfacao }}%</span>
                     <span class="metric-label">Satisfação</span>
                 </div>
                 <div class="metric-divider"></div>
                 <div class="metric-item">
-                    <span class="metric-number">10+</span>
+                    <span class="metric-number">5+</span>
                     <span class="metric-label">Anos de Experiência</span>
                 </div>
             </div>
         </div>
         <div class="hero-image-wrapper">
-            <img src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&q=80" alt="Atendimento na Clínica Aura" class="hero-img">
+            <img src={% static "img/principal.jpg" %} class="hero-img">
             <div class="hero-badge">
                 <i data-lucide="sparkles"></i>
                 <span>Atendimento Exclusivo</span>
@@ -222,5 +224,12 @@
 
 <script src="{% static 'js/header.js' %}"></script>
 <script src="{% static 'js/home.js' %}"></script>
+
+{{ avaliacoes|json_script:"avaliacoes-user-data" }}
+
+<script>
+    const avaliacoesEl = document.getElementById('avaliacoes-user-data');
+    window.avaliacoes = avaliacoesEl ? JSON.parse(avaliacoesEl.textContent) : [];
+</script>
 
 {% endblock script %}

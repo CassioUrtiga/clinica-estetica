@@ -33,6 +33,7 @@ class Agendamento(models.Model):
         ('pendente', 'Pendente'),
         ('confirmado', 'Confirmado'),
         ('cancelado', 'Cancelado'),
+        ('concluido', 'Concluído'),
     )
 
     nome = models.CharField(max_length=100)
@@ -44,6 +45,13 @@ class Agendamento(models.Model):
     observacoes = models.TextField(blank=True, null=True)
     criado_em = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pendente')
+    avaliacao = models.SmallIntegerField(
+        default=0,
+        validators=[
+            MinValueValidator(0),
+            MaxValueValidator(5)
+        ]
+    )
 
     class Meta:
         verbose_name = 'Agendamento'
