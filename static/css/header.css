@@ -10,11 +10,33 @@
     border-bottom: 1px solid var(--border-color);
 }
 
-.nav-container {
+.nav-container > div:first-child {
     display: flex;
-    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
     justify-content: space-between;
-    height: 80px;
+    align-items: center;
+    align-content: center;
+    padding: 15px;
+}
+
+.nav-container > div:first-child > div{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    align-content: center;
+    gap: 15px;
+}
+
+.nav-container > div:last-child {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    padding: 15px;
 }
 
 .logo {
@@ -230,6 +252,11 @@
     border-bottom: 1px solid var(--border-color);
 }
 
+.drawer-card-header{
+    display: flex;
+    justify-content: space-between;
+}
+
 .drawer-header h3 {
     font-size: 1.5rem;
     color: var(--text-main);
@@ -246,11 +273,18 @@
 
 .drawer-body {
     flex: 1;
-    padding: 24px;
+    padding: 15px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 16px;
+}
+
+.drawer-card-notes {
+    width: 100%;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    white-space: pre-wrap; 
 }
 
 .drawer-card {
@@ -258,9 +292,7 @@
     border: 1px solid var(--border-color);
     border-radius: var(--radius-sm);
     padding: 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+    margin-bottom: 10px;
 }
 
 .drawer-card-tag {
@@ -389,22 +421,29 @@
     text-transform: capitalize;
 }
 
-/* Status: Pendente (Amarelo / Laranja) */
+/* Status: Pendente */
 .drawer-card-tag.pending {
     background-color: #fef3c7;
     color: #d97706;
 }
 
-/* Status: Confirmado (Verde) */
+/* Status: Confirmado */
 .drawer-card-tag.confirmed {
     background-color: #dcfce7;
     color: #15803d;
 }
 
-/* Status: Cancelado (Vermelho) */
+/* Status: Cancelado */
 .drawer-card-tag.cancelled {
     background-color: #fee2e2;
     color: #b91c1c;
+}
+
+/* Status: Concluído */
+.drawer-card-tag.completed {
+    background-color: #f3f4f6;
+    color: #4b5563;
+    border: 1px solid #e5e7eb;
 }
 
 .form-error-msg {
@@ -413,6 +452,55 @@
     margin-top: 6px;
     display: block;
     text-align: center;
+}
+
+/* Avaliação */
+.rating-wrapper {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.rating-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    display: block;
+    margin-bottom: 4px;
+}
+
+.stars-container {
+    display: flex;
+    gap: 4px;
+}
+
+.stars-container .star-icon {
+    width: 18px;
+    height: 18px;
+    color: #D6D3D1;
+    cursor: pointer;
+    transition: transform 0.15s ease, color 0.15s ease;
+}
+
+/* Efeito Hover ao passar o mouse */
+.stars-container:not(.readonly) .star-icon:hover,
+.stars-container:not(.readonly) .star-icon.hover {
+    color: var(--accent-gold);
+    transform: scale(1.15);
+}
+
+/* Estrela Selecionada / Salva */
+.stars-container .star-icon.active {
+    color: var(--accent-gold);
+    fill: var(--accent-gold);
+}
+
+.stars-container.readonly .star-icon {
+    cursor: default;
 }
 
 

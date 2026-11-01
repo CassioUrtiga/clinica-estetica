@@ -39,13 +39,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Formata o nome (caso necessário)
     const formatName = (name) => name ? name : 'Não informado';
 
-    // Exibe mensagens temporárias de erro
-    const showError = (element, message) => {
-        if (!element) return;
-        element.textContent = message;
-        setTimeout(() => { element.textContent = ''; }, 4000);
-    };
-
     // Função para requisições POST
     async function sendPostRequest(form, payload) {
         const formData = new FormData();
@@ -97,26 +90,63 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Gera o HTML de um card individual de agendamento
     function criarCardAgendamentoHTML(item) {
-        const statusLower = item.status.toLowerCase();
+        const statusClean = item.status
+            ? item.status.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            : '';
+
         let tagClass = 'drawer-card-tag';
 
-        if (statusLower === 'confirmado') tagClass += ' confirmed';
-        else if (statusLower === 'cancelado') tagClass += ' cancelled';
+        if (statusClean === 'confirmado') tagClass += ' confirmed';
+        else if (statusClean === 'cancelado') tagClass += ' cancelled';
+        else if (statusClean === 'concluido') tagClass += ' completed';
         else tagClass += ' pending';
 
+        const isConcluido = statusClean === 'concluido';
+        
+        // 1. Busca a nota vinda diretamente do objeto 'item' ou pesquisa na lista 'avaliacoes'
+        let notaEncontrada = item.avaliacao;
+
+        if ((notaEncontrada === undefined || notaEncontrada === null) && typeof avaliacoes !== 'undefined' && Array.isArray(avaliacoes)) {
+            const agendamentoAvaliado = avaliacoes.find(a => String(a.id) === String(item.id));
+            if (agendamentoAvaliado) {
+                notaEncontrada = agendamentoAvaliado.avaliacao;
+            }
+        }
+
+        // 2. Normaliza para inteiro
+        const notaAtual = parseInt(notaEncontrada, 10) || 0;
+        const jaAvaliado = notaAtual > 0;
+
         return `
-            <div class="drawer-card">
+            <div class="drawer-card" data-id="${item.id}">
                 <div class="drawer-card-info">
-                    <span class="${tagClass}">${item.status}</span>
+                    <div class="drawer-card-header">
+                        <span class="${tagClass}">${item.status}</span>
+                        <span class="drawer-card-price">${item.preco}</span>
+                    </div>
                     <h4>${item.tratamento}</h4>
                     <p><i data-lucide="calendar"></i> ${item.data_hora}</p>
+                    
                     ${item.observacoes ? `
                         <p class="drawer-card-notes">
                             <span>${item.observacoes}</span>
                         </p>
                     ` : ''}
+
+                    ${isConcluido ? `
+                        <div class="rating-wrapper" data-agendamento-id="${item.id}">
+                            <span class="rating-feedback-msg" style="font-size: 0.75rem; display: block; margin-bottom: 2px; min-height: 16px;"></span>
+                            <span class="rating-label">${jaAvaliado ? 'Sua avaliação' : 'Avalie este atendimento'}</span>
+                            <div class="stars-container ${jaAvaliado ? 'readonly' : ''}">
+                                ${[1, 2, 3, 4, 5].map(star => `
+                                    <i data-lucide="star" 
+                                    class="star-icon ${star <= notaAtual ? 'active' : ''}" 
+                                    data-value="${star}"></i>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
                 </div>
-                <span class="drawer-card-price">${item.preco}</span>
             </div>
         `;
     }
@@ -149,6 +179,32 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         renderizarListaAgendamentos(agendamentos);
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function showMessageFeedback(element, message, isSuccess) {
+        if (!element) return;
+        
+        element.textContent = message;
+        element.style.color = isSuccess ? '#10b981' : '#ef4444';
+
+        setTimeout(() => {
+            element.textContent = '';
+        }, 4000);
     }
 
     // -------------------------------------------------------------
@@ -190,10 +246,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 DOM.formStepCode.classList.remove('hidden');
                 DOM.codeDigits[0]?.focus();
             } else {
-                showError(DOM.emailErrorMsg, data.message);
+                showMessageFeedback(DOM.emailErrorMsg, data.message, false);
             }
         } catch {
-            showError(DOM.emailErrorMsg, 'Erro de conexão. Tente novamente.');
+            showMessageFeedback(DOM.emailErrorMsg, 'Erro de conexão. Tente novamente.', false);
         } finally {
             submitBtn.disabled = false;
             submitBtn.textContent = 'Receber Código de Acesso';
@@ -206,7 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const code = Array.from(DOM.codeDigits).map(input => input.value).join('');
 
         if (code.length !== 5) {
-            showError(DOM.codeErrorMsg, 'Digite o código de 5 dígitos.');
+            showMessageFeedback(DOM.codeErrorMsg, 'Digite o código de 5 dígitos.', false);
             return;
         }
 
@@ -223,10 +279,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const emailUsado = DOM.sentEmailLabel?.textContent || '';
                 carregarInterfaceAutenticada(data.data.agendamentos, emailUsado);
             } else {
-                showError(DOM.codeErrorMsg, data.message || 'Código incorreto.');
+                showMessageFeedback(DOM.codeErrorMsg, data.message, false);
             }
         } catch {
-            showError(DOM.codeErrorMsg, 'Erro de conexão. Tente novamente.');
+            showMessageFeedback(DOM.codeErrorMsg, 'Erro de conexão. Tente novamente.', false);
         } finally {
             if (submitBtn) {
                 submitBtn.disabled = false;
@@ -255,6 +311,55 @@ document.addEventListener('DOMContentLoaded', () => {
                 DOM.codeDigits[index - 1].focus();
             }
         });
+    });
+
+    // Interatividade das estrelas para avaliações
+    document.addEventListener('click', async (e) => {
+        const starBtn = e.target.closest('.stars-container:not(.readonly) .star-icon');
+        if (!starBtn) return;
+
+        const container = starBtn.closest('.stars-container');
+        const wrapper = starBtn.closest('.rating-wrapper');
+        const feedbackEl = wrapper.querySelector('.rating-feedback-msg');
+        const agendamentoId = wrapper.dataset.agendamentoId;
+        const nota = starBtn.dataset.value;
+
+        try {
+            const response = await fetch('/agendamento/avaliar/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    agendamento_id: agendamentoId,
+                    nota: nota
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.status === 'success') {
+                container.classList.add('readonly');
+                
+                const label = wrapper.querySelector('.rating-label');
+                if (label) label.textContent = 'Sua avaliação';
+                
+                // Exibe a mensagem de sucesso da view
+                showMessageFeedback(feedbackEl, data.message, true);
+
+                const stars = container.querySelectorAll('.star-icon');
+                stars.forEach((s, idx) => {
+                    s.classList.toggle('active', idx < nota);
+                });
+
+                if (window.lucide) lucide.createIcons();
+            } else {
+                showMessageFeedback(feedbackEl, data.message, false);
+            }
+        } catch (err) {
+            showMessageFeedback(feedbackEl, 'Erro de conexão.', false);
+        }
     });
 
     // -------------------------------------------------------------

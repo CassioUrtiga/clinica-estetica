@@ -1,8 +1,11 @@
 import random
+import json
 from django.shortcuts import render, redirect
 from django.core.mail import send_mail
+from django.views.decorators.http import require_POST
 from django.conf import settings
 from django.contrib import messages
+from django.db.models import Avg
 from django.http import JsonResponse
 from .forms import AgendamentoForm
 from .models import Categoria, Tratamento, Agendamento
@@ -67,7 +70,13 @@ def home(request):
       'categorias': categorias,
       'tratamentos': tratamentos,
       'form': form,
-      'sessao': bool(request.session.get('cliente_autenticado_email'))
+      'sessao': bool(request.session.get('cliente_autenticado_email')),
+      'metrica_atendimentos': formatar_numero_k_m(Agendamento.objects.count()),
+      'metrica_satisfacao': metrica_satisfacao(),
+      'avaliacoes': list(
+         Agendamento.objects.filter(email__iexact=cliente_email_sessao)
+         .values('id', 'avaliacao')
+      ) if cliente_email_sessao else [],
    }
 
    return render(request, 'home.html', context)
@@ -133,6 +142,7 @@ def validar_codigo_email(request):
          request.session['cliente_autenticado_email'] = email_sessao
          
          lista_agendamentos = []
+
          for ag in agendamentos:
             data_str = ag.data.strftime('%d/%m/%Y') if ag.data else ''
             horario_str = ag.horario.strftime('%H:%M') if ag.horario else ''
@@ -144,18 +154,17 @@ def validar_codigo_email(request):
             else:
                nome_tratamento = 'Tratamento não informado'
                preco_val = 0.0
-            
-            preco_str = f"R$ {preco_val:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
 
             lista_agendamentos.append({
                'id': ag.id,
                'cliente_nome': ag.nome,
                'telefone': ag.telefone,
                'status': ag.status,
+               'avaliacao': ag.avaliacao or 0,
                'tratamento': nome_tratamento,
                'data_hora': data_hora_formatada,
                'observacoes': ag.observacoes or '',
-               'preco': preco_str
+               'preco': f"R$ {preco_val:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
             })
          
          # Limpa os dados de validação da sessão
@@ -225,4 +234,54 @@ def encerrar_sessao(request):
    request.session.pop('cliente_autenticado_email', None)
 
    return redirect('home')
-    
+
+@require_POST
+def avaliar_agendamento(request):
+   try:
+      data = json.loads(request.body)
+      agendamento_id = data.get('agendamento_id')
+      nota = data.get('nota')
+
+      agendamento = Agendamento.objects.get(id=agendamento_id)
+      agendamento.avaliacao = int(nota)
+      agendamento.save()
+
+      return JsonResponse({
+         'status': 'success', 
+         'message': 'Avaliação registrada com sucesso!'
+      })
+   except Agendamento.DoesNotExist:
+      return JsonResponse({
+         'status': 'error', 
+         'message': 'Agendamento não encontrado.'
+      }, status=404)
+   except Exception as e:
+      return JsonResponse({
+         'status': 'error', 
+         'message': 'Erro! Tente novamente.'
+      }, status=400)
+
+# Funções utilitárias
+def formatar_numero_k_m(valor):
+   if not isinstance(valor, (int, float)):
+      return '0'
+      
+   if valor >= 1_000_000:
+      val = valor / 1_000_000
+      return f"{val:.1f}".rstrip('0').rstrip('.') + 'M'
+   elif valor >= 1_000:
+      val = valor / 1_000
+      return f"{val:.1f}".rstrip('0').rstrip('.') + 'k'
+   
+   return str(valor)
+
+def metrica_satisfacao():
+   resultado = Agendamento.objects.filter(avaliacao__gt=0).aggregate(media=Avg('avaliacao'))
+   media = resultado['media']
+
+   if media is None:
+      return 0.0
+
+   percentual = (media / 5.0) * 100
+
+   return round(percentual, 1)

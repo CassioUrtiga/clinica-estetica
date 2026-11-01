@@ -7,4 +7,5 @@ urlpatterns = [
     path('validar-codigo/', views.validar_codigo_email, name='validar_codigo_email'),
     path('checar-sessao/', views.checar_sessao_cliente, name='checar_sessao_cliente'),
     path('encerrar-sessao/', views.encerrar_sessao, name='encerrar_sessao'),
+    path('agendamento/avaliar/', views.avaliar_agendamento, name='avaliar_agendamento'),
 ]

@@ -1,25 +1,29 @@
 <header class="header">
     <div class="container nav-container">
-        <a href="{% url 'home' %}" class="logo">AURA</a>
-        <nav>
-            <ul class="nav-menu">
-                <li><a href="#tratamentos" class="nav-link">Tratamentos</a></li>
-                <li><a href="#sobre" class="nav-link">A Clínica</a></li>
-                <li><a href="#contato" class="nav-link">Contato</a></li>
-            </ul>
-        </nav>
-        <div style="display: flex; gap: 12px; align-items: center;">
-            <button class="btn btn-primary" id="open-modal-btn">Agendar Consultoria</button>
-            <button class="btn btn-primary">Fale Conosco</button>
-            <button class="btn btn-outline" id="open-drawer-btn">Meus Tratamentos</button>
-            <a href="{% url 'encerrar_sessao' %}" 
-                class="btn btn-outline {% if not sessao %}hidden{% endif %}" 
-                id="close-session-btn" 
-                style="color: #dc2626; border: 1px solid #dc2626; background-color: transparent; transition: all 0.2s ease-in-out; text-decoration: none;"
-                onmouseover="this.style.backgroundColor='#dc2626'; this.style.color='#ffffff';"
-                onmouseout="this.style.backgroundColor='transparent'; this.style.color='#dc2626';">
-                    Encerrar
-            </a>
+        <div>
+            <a href="{% url 'home' %}" class="logo">AURA</a>
+            <div>
+                <button class="btn btn-primary" id="open-modal-btn">Agendar Consultoria</button>
+                <button class="btn btn-primary">Fale Conosco</button>
+                <button class="btn btn-outline" id="open-drawer-btn">Meus Tratamentos</button>
+                <a href="{% url 'encerrar_sessao' %}"
+                    class="btn btn-outline {% if not sessao %}hidden{% endif %}"
+                    id="close-session-btn"
+                    style="color: #dc2626; border: 1px solid #dc2626; background-color: transparent; transition: all 0.2s ease-in-out; text-decoration: none;"
+                    onmouseover="this.style.backgroundColor='#dc2626'; this.style.color='#ffffff';"
+                    onmouseout="this.style.backgroundColor='transparent'; this.style.color='#dc2626';">
+                        Sair
+                </a>
+            </div>
+        </div>
+        <div>
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="#tratamentos" class="nav-link">Tratamentos</a></li>
+                    <li><a href="#sobre" class="nav-link">A Clínica</a></li>
+                    <li><a href="#contato" class="nav-link">Contato</a></li>
+                </ul>
+            </nav>
         </div>
     </div>
 </header>
