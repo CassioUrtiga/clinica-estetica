@@ -441,9 +441,8 @@
 
 /* Status: Concluído */
 .drawer-card-tag.completed {
-    background-color: #f3f4f6;
-    color: #4b5563;
-    border: 1px solid #e5e7eb;
+    background-color: #dcecfc;
+    color: #0284c7;
 }
 
 .form-error-msg {
@@ -452,6 +451,69 @@
     margin-top: 6px;
     display: block;
     text-align: center;
+}
+
+/* ==========================================================================
+   FILTROS DE AGENDAMENTOS
+   ========================================================================== */
+.filter-container {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.filter-container::-webkit-scrollbar {
+    display: none;
+}
+
+.btn-filter {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Cores especificas para filtros ativos */
+.btn-filter.active[data-filter="todos"] {
+    background-color: #dcdfe3;
+    border-color: #4b5563;
+}
+
+.btn-filter.active[data-filter="confirmado"] {
+    background-color: #dcfce7;
+    border-color: #15803d;
+}
+
+.btn-filter.active[data-filter="concluido"] {
+    background-color: #dcecfc;
+    border-color: #0284c7;
+}
+
+.btn-filter.active[data-filter="cancelado"] {
+    background-color: #fee2e2;
+    border-color: #b91c1c;
+}
+
+.btn-filter.active[data-filter="pendente"] {
+    background-color: #fef3c7;
+    border-color: #d97706;
 }
 
 /* Avaliação */

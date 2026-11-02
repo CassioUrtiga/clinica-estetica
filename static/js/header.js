@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 Meus Tratamentos
             </span>
             <span style="display: block; font-size: 1rem; font-weight: 400; color: #64748b; margin-top: 2px;">
-                ${formatName(clienteNome)}
+                ${formatName(clienteNome).toUpperCase()}
             </span>
         `;
     }
@@ -152,16 +152,55 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Renderiza a lista completa de cards no Drawer
-    function renderizarListaAgendamentos(agendamentos) {
-        if (!DOM.treatmentsSection) return;
+    function renderizarListaAgendamentos(lista) {
+        const container = document.getElementById('treatments-section');
+        if (!container) return;
 
-        if (!agendamentos || agendamentos.length === 0) {
-            DOM.treatmentsSection.innerHTML = '<p class="empty-state">Nenhum agendamento encontrado.</p>';
+        if (!lista || lista.length === 0) {
+            container.innerHTML = `
+                <p id="no-appointments-msg" class="empty-state-msg" style="text-align: center; color: #64748b; padding: 24px; font-size: 0.9rem;">
+                    Você ainda não possui agendamentos.
+                </p>
+            `;
             return;
         }
 
-        DOM.treatmentsSection.innerHTML = agendamentos.map(criarCardAgendamentoHTML).join('');
-        if (window.lucide) lucide.createIcons();
+        // Identifica qual filtro está ativo atualmente (para manter a seleção após re-renderizar)
+        const btnAtivoAtual = container.querySelector('.btn-filter.active');
+        const filtroAtivo = btnAtivoAtual ? btnAtivoAtual.getAttribute('data-filter') : 'todos';
+
+        const htmlFiltros = `
+            <div id="filter-buttons-container" class="filter-container">
+                <button class="btn-filter ${filtroAtivo === 'todos' ? 'active' : ''}" data-filter="todos">Todos</button>
+                <button class="btn-filter ${filtroAtivo === 'confirmado' ? 'active' : ''}" data-filter="confirmado">Confirmados</button>
+                <button class="btn-filter ${filtroAtivo === 'pendente' ? 'active' : ''}" data-filter="pendente">Pendentes</button>
+                <button class="btn-filter ${filtroAtivo === 'concluido' ? 'active' : ''}" data-filter="concluido">Concluídos</button>
+                <button class="btn-filter ${filtroAtivo === 'cancelado' ? 'active' : ''}" data-filter="cancelado">Cancelados</button>
+            </div>
+        `;
+
+        // Renderização dos cards
+        const htmlCards = lista.map(item => criarCardAgendamentoHTML(item)).join('');
+
+        // Mensagem de estado vazio (para os filtros)
+        const htmlMensagemVazia = `
+            <p id="no-appointments-msg" class="empty-state-msg card-hidden" style="text-align: center; color: #64748b; padding: 24px; font-size: 0.9rem; display: none;">
+                Nenhum agendamento encontrado para este filtro.
+            </p>
+        `;
+
+        // Injeta na ordem: Filtros -> Cards -> Mensagem
+        container.innerHTML = htmlFiltros + htmlCards + htmlMensagemVazia;
+
+        // Atualiza os ícones do Lucide após reescrever o DOM
+        if (window.lucide) {
+            lucide.createIcons();
+        }
+
+        // Reaplica o filtro ativo caso a lista tenha sido atualizada dinamicamente
+        if (filtroAtivo !== 'todos' && typeof filtrarCardsAgendamento === 'function') {
+            filtrarCardsAgendamento(filtroAtivo);
+        }
     }
 
     // Função de interface autenticada
@@ -205,6 +244,61 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             element.textContent = '';
         }, 4000);
+    }
+
+    // Função de filtragem de cards
+    function filtrarCardsAgendamento(statusFiltro) {
+        const filtroClean = statusFiltro.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+        const cards = document.querySelectorAll('#treatments-section .drawer-card');
+        const emptyMsg = document.getElementById('no-appointments-msg');
+
+        let cardsVisiveis = 0;
+
+        cards.forEach(card => {
+            if (filtroClean === 'todos') {
+                card.classList.remove('card-hidden');
+                card.style.display = '';
+                cardsVisiveis++;
+                return;
+            }
+
+            const tagElement = card.querySelector('.drawer-card-tag');
+            const statusTexto = tagElement ? tagElement.textContent : '';
+
+            const statusClean = statusTexto
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .trim();
+
+            const corresponde = 
+                statusClean === filtroClean ||
+                statusClean.startsWith(filtroClean) || 
+                (filtroClean === 'concluido' && (statusClean === 'concluidos' || tagElement?.classList.contains('completed'))) ||
+                (filtroClean === 'pendente' && (statusClean === 'pendentes' || tagElement?.classList.contains('pending'))) ||
+                (filtroClean === 'cancelado' && (statusClean === 'cancelados' || tagElement?.classList.contains('cancelled'))) ||
+                (filtroClean === 'confirmado' && (statusClean === 'confirmados' || tagElement?.classList.contains('confirmed')));
+
+            if (corresponde) {
+                card.classList.remove('card-hidden');
+                card.style.display = ''; 
+                cardsVisiveis++;
+            } else {
+                card.classList.add('card-hidden');
+                card.style.display = 'none';
+            }
+        });
+
+        // Controla a exibição da mensagem de "nenhum item encontrado"
+        if (emptyMsg) {
+            if (cardsVisiveis === 0) {
+                emptyMsg.classList.remove('card-hidden');
+                emptyMsg.style.display = 'block';
+            } else {
+                emptyMsg.classList.add('card-hidden');
+                emptyMsg.style.display = 'none';
+            }
+        }
     }
 
     // -------------------------------------------------------------
@@ -313,7 +407,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Interatividade das estrelas para avaliações
+    // Interatividade para avaliações
     document.addEventListener('click', async (e) => {
         const starBtn = e.target.closest('.stars-container:not(.readonly) .star-icon');
         if (!starBtn) return;
@@ -360,6 +454,23 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (err) {
             showMessageFeedback(feedbackEl, 'Erro de conexão.', false);
         }
+    });
+
+    // Filtro
+    document.addEventListener('click', (event) => {
+        const btn = event.target.closest('.btn-filter');
+        if (!btn) return;
+
+        // Remove a classe ativa dos demais botões dentro do container
+        const container = btn.closest('#filter-buttons-container') || btn.parentElement;
+        container.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
+
+        // Ativa o botão clicado
+        btn.classList.add('active');
+
+        // Executa a filtragem
+        const filterValue = btn.getAttribute('data-filter');
+        filtrarCardsAgendamento(filterValue);
     });
 
     // -------------------------------------------------------------

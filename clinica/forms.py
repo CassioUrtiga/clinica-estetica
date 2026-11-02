@@ -35,3 +35,7 @@ class AgendamentoForm(forms.ModelForm):
                 'placeholder': 'Alguma condição médica ou preferência?'
             }),
         }
+
+    def clean_nome(self):
+        nome = self.cleaned_data.get('nome')
+        return nome.upper() if nome else nome

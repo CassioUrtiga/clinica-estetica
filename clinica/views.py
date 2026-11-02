@@ -14,11 +14,10 @@ from .models import Categoria, Tratamento, Agendamento
 def home(request):
    categorias = Categoria.objects.all()
    tratamentos = Tratamento.objects.all()
+   cliente_email_sessao = request.session.get('cliente_autenticado_email')
 
    if request.method == 'POST':
       data = request.POST.copy()
-      
-      cliente_email_sessao = request.session.get('cliente_autenticado_email')
       
       if cliente_email_sessao:
          # O e-mail enviado no form seja o mesmo e-mail validado na sessão
@@ -52,8 +51,6 @@ def home(request):
          messages.error(request, 'Ocorreu um erro! Campos inválidos ou incompletos.')
          return redirect('home')
    else:
-      # Inicializa o formulário com o e-mail autenticado (se existir na sessão)
-      cliente_email_sessao = request.session.get('cliente_autenticado_email')
       initial_data = {}
       
       if cliente_email_sessao:
@@ -66,11 +63,20 @@ def home(request):
 
       form = AgendamentoForm(initial=initial_data)
 
+   # Verifica se no cliente autenticado existe agendamento
+   if cliente_email_sessao:
+      tem_agendamento = Agendamento.objects.filter(email__iexact=cliente_email_sessao).exists()
+
+      if not tem_agendamento:
+         request.session.pop('cliente_autenticado_email', None)
+         cliente_email_sessao = None
+         messages.warning(request, 'Não existem mais agendamentos vinculados a esta conta. Realize um novo cadastro!')
+
    context = {
       'categorias': categorias,
       'tratamentos': tratamentos,
       'form': form,
-      'sessao': bool(request.session.get('cliente_autenticado_email')),
+      'sessao': bool(cliente_email_sessao),
       'metrica_atendimentos': formatar_numero_k_m(Agendamento.objects.count()),
       'metrica_satisfacao': metrica_satisfacao(),
       'avaliacoes': list(
@@ -210,8 +216,6 @@ def checar_sessao_cliente(request):
       else:
          nome_tratamento = 'Tratamento não informado'
          preco_val = 0.0
-      
-      preco_str = f"R$ {preco_val:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
 
       lista_agendamentos.append({
          'id': ag.id,
@@ -221,7 +225,7 @@ def checar_sessao_cliente(request):
          'tratamento': nome_tratamento,
          'data_hora': data_hora_formatada,
          'observacoes': ag.observacoes or '',
-         'preco': preco_str
+         'preco': f"R$ {preco_val:,.2f}".replace(',', 'X').replace('.', ',').replace('X', '.')
       })
 
    return JsonResponse({
