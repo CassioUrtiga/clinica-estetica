@@ -1,5 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 
 class Categoria(models.Model):
     nome = models.CharField(max_length=50)
@@ -60,3 +62,37 @@ class Agendamento(models.Model):
 
     def __str__(self):
         return f"{self.nome} - {self.tratamento} ({self.data})"
+
+class RelatorioAgendamento(models.Model):
+    nome = models.CharField(max_length=100)
+    email = models.EmailField()
+    telefone = models.CharField(max_length=20)
+    tratamento_nome = models.CharField(max_length=100, blank=True, null=True)
+    data = models.DateField()
+    horario = models.TimeField()
+    status_final = models.CharField(max_length=20)
+    avaliacao = models.SmallIntegerField(default=0)
+    deletado_em = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Relatório de Agendamento'
+        verbose_name_plural = 'Relatórios de Agendamentos'
+        ordering = ['-deletado_em']
+
+    def __str__(self):
+        return f"Histórico: {self.nome} - {self.data}"
+
+
+# Sinal acionado automaticamente ANTES/DEPOIS de deletar um Agendamento
+@receiver(post_delete, sender=Agendamento)
+def salvar_historico_agendamento(sender, instance, **kwargs):
+    RelatorioAgendamento.objects.create(
+        nome=instance.nome,
+        email=instance.email,
+        telefone=instance.telefone,
+        tratamento_nome=instance.tratamento.titulo if instance.tratamento else "Tratamento Removido",
+        data=instance.data,
+        horario=instance.horario,
+        status_final=instance.get_status_display(),
+        avaliacao=instance.avaliacao
+    )
