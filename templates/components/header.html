@@ -19,8 +19,9 @@
         <div>
             <nav>
                 <ul class="nav-menu">
+                    <li><a href="#inicio" class="nav-link">Início</a></li>
                     <li><a href="#tratamentos" class="nav-link">Tratamentos</a></li>
-                    <li><a href="#sobre" class="nav-link">A Clínica</a></li>
+                    <li><a href="#sobre" class="nav-link">Sobre</a></li>
                     <li><a href="#contato" class="nav-link">Contato</a></li>
                 </ul>
             </nav>
@@ -92,6 +93,10 @@
             <!-- ETAPA 2: LISTA DE TRATAMENTOS DO USUÁRIO -->
             <div id="treatments-section" class="user-treatments-box hidden">
                 <!-- Os cards serão injetados dinamicamente via JS aqui -->
+
+                <p id="no-appointments-msg" class="empty-state-msg card-hidden" style="text-align: center; color: #64748b; padding: 24px; font-size: 0.9rem;">
+                    Nenhum agendamento encontrado para este filtro.
+                </p>
             </div>
         </div>
 
