@@ -72,10 +72,10 @@
         <div class="before-after-wrapper">
             <div class="comparison-slider" id="comparison-slider">
                 <!-- Imagem do Depois (Fundo) -->
-                <img src="https://images.unsplash.com/photo-1512290900673-7002004117b8?auto=format&fit=crop&q=80" alt="Depois" class="img-after">
+                <img src={% static "img/depois.jpg" %} alt="Depois" class="img-after">
                 <!-- Imagem do Antes (Sobreposta/Cortada) -->
                 <div class="img-before-wrapper" id="before-wrapper">
-                    <img src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80" alt="Antes" class="img-before">
+                    <img src={% static "img/antes.jpg" %} alt="Antes" class="img-before">
                 </div>
                 <!-- Barra Divisora -->
                 <div class="slider-handle" id="slider-handle">
@@ -93,73 +93,64 @@
     </div>
 </section>
 
-<!-- CALCULADORA DE PROCEDIMENTOS -->
-<section class="section-calculator">
-    <div class="container">
-        <div class="calculator-card">
-            <div class="calculator-header">
-                <span class="section-tag">Simulador Rápido</span>
-                <h2 class="section-title">Monte seu Combo de Tratamentos</h2>
-                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 8px;">
-                    Selecione 2 ou mais procedimentos e ganhe <strong>10% de desconto</strong> automático.
-                </p>
+<!-- SEÇÃO SOBRE A CLÍNICA -->
+<section id="sobre" class="section-sobre">
+    <div class="container sobre-grid">
+        <div class="sobre-visual">
+            <div class="sobre-img-wrapper main-img">
+                <img src={% static "img/sobre1.jpg" %} alt="Interior da Clínica" loading="lazy">
             </div>
-
-            <div class="calculator-body">
-                <div class="calc-options">
-                    <label class="calc-item">
-                        <input type="checkbox" class="calc-checkbox" data-price="250" value="Limpeza de Pele">
-                        <div class="calc-info">
-                            <span class="calc-name">Limpeza de Pele Profunda</span>
-                            <span class="calc-price">R$ 250,00</span>
-                        </div>
-                    </label>
-
-                    <label class="calc-item">
-                        <input type="checkbox" class="calc-checkbox" data-price="1200" value="Preenchimento Labial">
-                        <div class="calc-info">
-                            <span class="calc-name">Preenchimento Labial</span>
-                            <span class="calc-price">R$ 1.200,00</span>
-                        </div>
-                    </label>
-
-                    <label class="calc-item">
-                        <input type="checkbox" class="calc-checkbox" data-price="180" value="Drenagem Linfática">
-                        <div class="calc-info">
-                            <span class="calc-name">Drenagem Linfática</span>
-                            <span class="calc-price">R$ 180,00</span>
-                        </div>
-                    </label>
-
-                    <label class="calc-item">
-                        <input type="checkbox" class="calc-checkbox" data-price="350" value="Peeling Químico">
-                        <div class="calc-info">
-                            <span class="calc-name">Peeling Químico</span>
-                            <span class="calc-price">R$ 350,00</span>
-                        </div>
-                    </label>
-                </div>
-
-                <div class="calc-summary">
-                    <h3>Resumo da Simulação</h3>
-                    <div class="summary-line">
-                        <span>Subtotal:</span>
-                        <span id="calc-subtotal">R$ 0,00</span>
-                    </div>
-                    <div class="summary-line discount-line">
-                        <span>Desconto Combo (10%):</span>
-                        <span id="calc-discount">- R$ 0,00</span>
-                    </div>
-                    <div class="summary-divider"></div>
-                    <div class="summary-line total-line">
-                        <span>Estimativa Total:</span>
-                        <span id="calc-total">R$ 0,00</span>
-                    </div>
-                    <button class="btn btn-primary" id="open-modal-calc" style="width: 100%; margin-top: 20px;">
-                        Agendar este Combo
-                    </button>
+            <div class="sobre-img-wrapper badge-card">
+                <div class="glass-badge">
+                    <span class="badge-number">10+</span>
+                    <span class="badge-text">Anos de Excelência & Inovação</span>
                 </div>
             </div>
+            <div class="sobre-img-wrapper detail-img">
+                <img src={% static "img/sobre2.jpg" %} alt="Atendimento exclusivo" loading="lazy">
+            </div>
+        </div>
+
+        <!-- Coluna da Direita: Conteúdo Institucional -->
+        <div class="sobre-content">
+            <span class="section-tag">A Clínica</span>
+            <h2 class="section-title">Onde a alta tecnologia encontra a arte do bem-estar</h2>
+            <p class="section-description">
+                Fundada com a premissa de redefinir o conceito de estética avançada, a <strong>AURA</strong> une protocolos médico-estéticos de ponta a um ambiente projetado para ser um refúgio de tranquilidade e sofisticação.
+            </p>
+
+            <!-- Destaques / Pilares -->
+            <ul class="sobre-features">
+                <li class="feature-item">
+                    <div class="feature-icon">
+                        <i data-lucide="sparkles"></i>
+                    </div>
+                    <div class="feature-text">
+                        <h4>Protocolos Exclusivos</h4>
+                        <p>Tratamentos personalizados desenvolvidos sob medida para as necessidades únicas da sua pele.</p>
+                    </div>
+                </li>
+
+                <li class="feature-item">
+                    <div class="feature-icon">
+                        <i data-lucide="shield-check"></i>
+                    </div>
+                    <div class="feature-text">
+                        <h4>Tecnologia de Ponta</h4>
+                        <p>Equipamentos de última geração aprovados internacionalmente pelos mais rigorosos órgãos de saúde.</p>
+                    </div>
+                </li>
+
+                <li class="feature-item">
+                    <div class="feature-icon">
+                        <i data-lucide="award"></i>
+                    </div>
+                    <div class="feature-text">
+                        <h4>Equipe Especializada</h4>
+                        <p>Profissionais renomados em constante atualização com os avanços globais da dermatologia e estética.</p>
+                    </div>
+                </li>
+            </ul>
         </div>
     </div>
 </section>

@@ -70,7 +70,7 @@ def home(request):
       if not tem_agendamento:
          request.session.pop('cliente_autenticado_email', None)
          cliente_email_sessao = None
-         messages.warning(request, 'Não existem mais agendamentos vinculados a esta conta. Realize um novo cadastro!')
+         messages.warning(request, 'Realize um novo cadastro! Não existem mais agendamentos vinculados a esta conta.')
 
    context = {
       'categorias': categorias,
