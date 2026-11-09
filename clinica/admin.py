@@ -66,7 +66,7 @@ def exportar_para_excel(modeladmin, request, queryset):
 
 @admin.register(RelatorioAgendamento)
 class RelatorioAgendamentoAdmin(admin.ModelAdmin):
-    list_display = ('nome', 'email', 'tratamento_nome', 'data', 'status_final', 'deletado_em')
+    list_display = ('nome', 'email', 'tratamento_nome', 'preco', 'data', 'status_final', 'deletado_em')
     list_filter = ('data', 'deletado_em', 'status_final')
     search_fields = ('nome', 'email', 'telefone', 'tratamento_nome')
     readonly_fields = [f.name for f in RelatorioAgendamento._meta.fields]

@@ -22,6 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
         emailErrorMsg: document.getElementById('email-error-msg'),
         codeErrorMsg: document.getElementById('code-error-msg'),
         codeDigits: document.querySelectorAll('.code-digit'),
+        drawerTabs: document.getElementById('drawer-tabs'),
+        historySection: document.getElementById('history-section'),
 
         // Inputs do Formulário Principal
         inputNome: document.getElementById('id_nome'),
@@ -203,6 +205,103 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Card de um agendamento excluído (somente leitura)
+    function criarCardHistoricoHTML(item) {
+        const statusClean = (item.status || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+        let tagClass = 'drawer-card-tag';
+        if (statusClean === 'confirmado') tagClass += ' confirmed';
+        else if (statusClean === 'cancelado') tagClass += ' cancelled';
+        else if (statusClean === 'concluido') tagClass += ' completed';
+        else tagClass += ' pending';
+
+        const nota = parseInt(item.avaliacao, 10) || 0;
+
+        return `
+            <div class="drawer-card" data-id="${item.id}">
+                <div class="drawer-card-info">
+                    <div class="drawer-card-header">
+                        <span class="${tagClass}">${item.status}</span>
+                    </div>
+                    <h4>${item.tratamento}</h4>
+                    <p><i data-lucide="calendar"></i> ${item.data_hora}</p>
+                    <p class="drawer-card-deleted">
+                        <i data-lucide="trash-2"></i> Excluído em ${item.deletado_em}
+                    </p>
+                    ${nota > 0 ? `
+                        <div class="rating-wrapper">
+                            <span class="rating-label">Sua avaliação</span>
+                            <div class="stars-container readonly">
+                                ${[1, 2, 3, 4, 5].map(star => `
+                                    <i data-lucide="star"
+                                    class="star-icon ${star <= nota ? 'active' : ''}"
+                                    data-value="${star}"></i>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }
+
+    function renderizarHistorico(lista) {
+        if (!DOM.historySection) return;
+
+        if (!lista || lista.length === 0) {
+            DOM.historySection.innerHTML = `
+                <p class="empty-state-msg" style="text-align: center; color: #64748b; padding: 24px; font-size: 0.9rem;">
+                    Nenhum agendamento excluído até o momento.
+                </p>
+            `;
+            return;
+        }
+
+        DOM.historySection.innerHTML = lista.map(criarCardHistoricoHTML).join('');
+        if (window.lucide) lucide.createIcons();
+    }
+
+    async function carregarHistorico() {
+        if (!DOM.historySection) return;
+
+        DOM.historySection.innerHTML = `
+            <p class="empty-state-msg" style="text-align: center; color: #64748b; padding: 24px; font-size: 0.9rem;">
+                Carregando histórico...
+            </p>
+        `;
+
+        try {
+            const response = await fetch('/historico/');
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                renderizarHistorico(data.historico);
+            } else {
+                throw new Error(data.message);
+            }
+        } catch {
+            DOM.historySection.innerHTML = `
+                <p class="empty-state-msg" style="text-align: center; color: #ef4444; padding: 24px; font-size: 0.9rem;">
+                    Não foi possível carregar o histórico.
+                </p>
+            `;
+        }
+    }
+
+    // Alterna entre as abas "Agendamentos" e "Histórico"
+    function alternarAba(aba) {
+        const isHistorico = aba === 'history';
+
+        DOM.treatmentsSection?.classList.toggle('hidden', isHistorico);
+        DOM.historySection?.classList.toggle('hidden', !isHistorico);
+
+        DOM.drawerTabs?.querySelectorAll('.drawer-tab').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.tab === aba);
+        });
+
+        if (isHistorico) carregarHistorico();
+    }
+
     // Função de interface autenticada
     function carregarInterfaceAutenticada(agendamentos, emailCliente) {
         if (!DOM.authSection || !DOM.treatmentsSection) return;
@@ -211,6 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         DOM.authSection.classList.add('hidden');
         DOM.treatmentsSection.classList.remove('hidden');
+        DOM.drawerTabs?.classList.remove('hidden');
 
         if (agendamentos && agendamentos.length > 0) {
             atualizarTituloDrawer(agendamentos[0].cliente_nome);
@@ -218,6 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         renderizarListaAgendamentos(agendamentos);
+        alternarAba('treatments');
     }
 
     function getCookie(name) {
@@ -314,6 +415,11 @@ document.addEventListener('DOMContentLoaded', () => {
     DOM.openDrawerBtn?.addEventListener('click', () => toggleElement(DOM.drawerOverlay, true));
     DOM.closeDrawerBtn?.addEventListener('click', () => toggleElement(DOM.drawerOverlay, false));
     DOM.drawerOverlay?.addEventListener('click', (e) => { if (e.target === DOM.drawerOverlay) toggleElement(DOM.drawerOverlay, false); });
+
+    DOM.drawerTabs?.addEventListener('click', (e) => {
+        const btn = e.target.closest('.drawer-tab');
+        if (btn) alternarAba(btn.dataset.tab);
+    });
 
     DOM.openModalFromDrawer?.addEventListener('click', () => {
         toggleElement(DOM.drawerOverlay, false);

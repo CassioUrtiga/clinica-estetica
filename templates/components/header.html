@@ -90,6 +90,12 @@
                 </form>
             </div>
 
+            <!-- ABAS (visíveis só quando autenticado) -->
+            <div id="drawer-tabs" class="drawer-tabs hidden">
+                <button type="button" class="drawer-tab active" data-tab="treatments">Agendamentos</button>
+                <button type="button" class="drawer-tab" data-tab="history">Histórico</button>
+            </div>
+
             <!-- ETAPA 2: LISTA DE TRATAMENTOS DO USUÁRIO -->
             <div id="treatments-section" class="user-treatments-box hidden">
                 <!-- Os cards serão injetados dinamicamente via JS aqui -->
@@ -98,6 +104,9 @@
                     Nenhum agendamento encontrado para este filtro.
                 </p>
             </div>
+
+            <!-- ETAPA 3: HISTÓRICO (AGENDAMENTOS EXCLUÍDOS) -->
+            <div id="history-section" class="user-treatments-box hidden"></div>
         </div>
 
         <div class="drawer-footer">
