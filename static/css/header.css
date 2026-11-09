@@ -190,22 +190,6 @@
     background-color: var(--bg-surface);
 }
 
-@media (max-width: 640px) {
-    .modal-container {
-        padding: 24px 20px;
-    }
-
-    .modal-close {
-        top: 16px;
-        right: 16px;
-    }
-
-    .form-row {
-        grid-template-columns: 1fr;
-        gap: 0;
-    }
-}
-
 /* ==========================================================================
    DRAWER (BARRA LATERAL)
    ========================================================================== */
@@ -516,7 +500,47 @@
     border-color: #d97706;
 }
 
-/* Avaliação */
+/* ==========================================================================
+   FILTRO DE HISTÓRICO
+   ========================================================================== */
+.drawer-tabs { 
+    display: flex; 
+    gap: 8px; 
+    margin-bottom: 16px; 
+    border-bottom: 1px solid #e2e8f0; 
+}
+
+.drawer-tabs.hidden { 
+    display: none; 
+}
+
+.drawer-tab {
+    flex: 1; 
+    padding: 10px 0; 
+    background: none; 
+    border: none;
+    border-bottom: 2px solid transparent; 
+    color: #64748b;
+    font-weight: 600; 
+    cursor: pointer;
+}
+.drawer-tab.active { 
+    color: #1e293b; 
+    border-bottom-color: #1e293b; 
+}
+
+.drawer-card-deleted {
+    display: flex; 
+    align-items: center; 
+    gap: 6px;
+    font-size: 0.8rem; 
+    color: #94a3b8; 
+    margin-top: 4px;
+}
+
+/* ==========================================================================
+   AVALIAÇÃO
+   ========================================================================== */
 .rating-wrapper {
     margin-top: 10px;
     padding-top: 8px;
@@ -566,12 +590,30 @@
 }
 
 
-/* RESPONSIVIDADE */
+/* ==========================================================================
+   RESPONSIVIDADE
+   ========================================================================== */
 @media (max-width: 768px) {
     .nav-menu {
         display: none;
     }
     .form-row {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .modal-container {
+        padding: 24px 20px;
+    }
+
+    .modal-close {
+        top: 16px;
+        right: 16px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
     }
 }

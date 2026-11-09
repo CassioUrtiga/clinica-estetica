@@ -2,13 +2,13 @@ import random
 import json
 from django.shortcuts import render, redirect
 from django.core.mail import send_mail
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_GET
 from django.conf import settings
 from django.contrib import messages
 from django.db.models import Avg
 from django.http import JsonResponse
 from .forms import AgendamentoForm
-from .models import Categoria, Tratamento, Agendamento
+from .models import Categoria, Tratamento, Agendamento, RelatorioAgendamento
 
 
 def home(request):
@@ -91,7 +91,10 @@ def validar_email(request):
    if request.method == 'POST':
       email = request.POST.get('emailConta', '').strip()
       
-      user_exists = Agendamento.objects.filter(email__iexact=email).exists()
+      user_exists = (
+         Agendamento.objects.filter(email__iexact=email).exists()
+         or RelatorioAgendamento.objects.filter(email__iexact=email).exists()
+      )
       
       if user_exists:
          # Gera código numérico aleatório de 5 dígitos
@@ -233,6 +236,36 @@ def checar_sessao_cliente(request):
       'email': email_sessao,
       'agendamentos': lista_agendamentos
    })
+
+@require_GET
+def historico_agendamentos(request):
+   email_sessao = request.session.get('cliente_autenticado_email')
+
+   if not email_sessao:
+      return JsonResponse({
+         'success': False,
+         'message': 'Sessão não autenticada.'
+      }, status=401)
+
+   # Meta.ordering já ordena por -deletado_em
+   registros = RelatorioAgendamento.objects.filter(email__iexact=email_sessao)
+
+   historico = []
+   for r in registros:
+      data_str = r.data.strftime('%d/%m/%Y') if r.data else ''
+      horario_str = r.horario.strftime('%H:%M') if r.horario else ''
+      deletado_str = r.deletado_em.strftime('%d/%m/%Y às %H:%M') if r.deletado_em else ''
+
+      historico.append({
+         'id': r.id,
+         'status': r.status_final,
+         'avaliacao': r.avaliacao or 0,
+         'tratamento': r.tratamento_nome or 'Tratamento não informado',
+         'data_hora': f"{data_str} às {horario_str}",
+         'deletado_em': deletado_str,
+      })
+
+   return JsonResponse({'success': True, 'historico': historico})
 
 def encerrar_sessao(request):
    request.session.pop('cliente_autenticado_email', None)

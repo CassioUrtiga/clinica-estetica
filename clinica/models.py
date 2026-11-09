@@ -68,6 +68,7 @@ class RelatorioAgendamento(models.Model):
     email = models.EmailField()
     telefone = models.CharField(max_length=20)
     tratamento_nome = models.CharField(max_length=100, blank=True, null=True)
+    preco = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     data = models.DateField()
     horario = models.TimeField()
     status_final = models.CharField(max_length=20)
@@ -91,6 +92,7 @@ def salvar_historico_agendamento(sender, instance, **kwargs):
         email=instance.email,
         telefone=instance.telefone,
         tratamento_nome=instance.tratamento.titulo if instance.tratamento else "Tratamento Removido",
+        preco=instance.tratamento.preco,
         data=instance.data,
         horario=instance.horario,
         status_final=instance.get_status_display(),
